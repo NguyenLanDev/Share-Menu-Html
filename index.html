@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>FF - Panel Aim Nlan</title>
+<link rel="icon" href="https://i.imgur.com/GjxiWE9.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
+<style>
+  :root{
+    --bg:#060609;
+    --card:#0f0f12;
+    --muted:#9aa0a6;
+    --accent1:#b260ff;
+    --accent2:#6a00ff;
+    --accent3:#9c33ffbd;
+    --accent4:#6811e2;
+    --glass: rgba(255,255,255,0.03);
+    --glow: 0 8px 40px rgba(106,0,255,0.12);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  html,body{height:100%;margin:0;background: radial-gradient(1200px 600px at 10% 10%, rgba(106,0,255,0.06), transparent), 
+            radial-gradient(900px 500px at 90% 90%, rgba(178,96,255,0.04), transparent), var(--bg);
+            color: #e6e6e9; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  .stage {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+  .panel {
+    width: 360px;
+    max-width: calc(100% - 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: var(--radius);
+    box-shadow: var(--glow);
+    border: 1px solid rgba(255,255,255,0.04);
+    overflow:hidden;
+    position:relative;
+    backdrop-filter: blur(6px);
+  }
+  .panel-header {
+    padding: 18px 16px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    background: linear-gradient(90deg, rgba(106,0,255,0.02), rgba(178,96,255,0.02));
+  }
+  .brand {
+    display:flex;gap:10px;align-items:center;
+  }
+  .brand .logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(106,0,255,0.18), inset 0 -6px 18px rgba(255,255,255,0.03);
+  overflow: hidden;
+}
+.brand .logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+  .brand .title {
+    line-height:1; 
+  }
+  .brand .title .main { font-weight:700; font-size:15px; letter-spacing:0.2px;}
+  .brand .title .sub { font-size:11px; color:var(--muted); margin-top:2px; }
+  .header-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .btn-circle {
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--glass); border:1px solid rgba(255,255,255,0.02); cursor:grab;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  }
+  .btn-circle:active { cursor:grabbing; }
+  .panel-body { padding:14px 14px 18px; display:grid; gap:12px; }
+  .section-title {
+    font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .control-row {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px;border-radius:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border: 1px solid rgba(255,255,255,0.02);
+    transition: transform .12s ease;
+  }
+  .control-row:hover { transform: translateY(-3px); }
+  .control-left { display:flex;gap:12px;align-items:center; }
+  .control-left .icon {
+    width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background: linear-gradient(135deg, rgba(156,51,255,0.12), rgba(106,0,255,0.12));
+    border:1px solid rgba(255,255,255,0.02);
+    box-shadow: 0 6px 18px rgba(106,0,255,0.06);
+    font-size:16px;
+  }
+  .control-left .meta { min-width:0; }
+  .control-left .meta .name { font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .control-left .meta .desc { font-size:11px;color:var(--muted); margin-top:4px; }
+.toggle {
+  position: relative;
+  width: 56px;
+  height: 30px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+  border: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: background .3s, box-shadow .3s;
+}
+.toggle .knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(180deg,#fff,#e8e8e8);
+  box-shadow: 0 4px 14px rgba(106,0,255,0.12);
+  transition: transform .35s cubic-bezier(.2,.9,.3,1), box-shadow .25s;
+  transform: translateX(0);
+}
+.toggle.active {
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  box-shadow: 0 8px 30px rgba(106,0,255,0.12);
+}
+
+.toggle.active .knob {
+  transform: translateX(26px);
+  box-shadow: 0 8px 24px rgba(106,0,255,0.28);
+}
+  .badge {
+    font-size:11px;padding:6px 8px;border-radius:999px;background:linear-gradient(90deg,var(--accent3), var(--accent4));
+    color:#fff;font-weight:600; box-shadow: 0 8px 30px rgba(106,0,255,0.08);
+  }
+  .stream-note { font-size:12px;color:var(--muted); margin-top:6px; }
+  .panel-footer { padding:12px 14px; border-top:1px solid rgba(255,255,255,0.02); display:flex;gap:8px; align-items:center; justify-content:space-between; }
+  .small { font-size:12px;color:var(--muted); }
+  .drag-hint { font-size:10px;color:var(--muted); margin-left:6px; }
+  @media (max-width:420px){
+    .panel { width:92%; }
+    .brand .logo { width:40px;height:40px; }
+  }
+  .control-row.active .icon {
+    box-shadow: 0 10px 40px rgba(178,96,255,0.15), 0 0 26px rgba(106,0,255,0.06) inset;
+    animation: neon 2.4s ease-in-out infinite;
+  }
+  @keyframes neon {
+    0% { filter: drop-shadow(0 0 0 rgba(178,96,255,0)); }
+    50% { filter: drop-shadow(0 0 22px rgba(178,96,255,0.18)); }
+    100% { filter: drop-shadow(0 0 0 rgba(178,96,255,0)); }
+  }
+  .status-dot { width:10px;height:10px;border-radius:50%;background:#2fd98f;margin-left:8px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 12px rgba(47,217,143,0.08); }
+  .status-off { background:#ff6b9b; box-shadow:0 6px 12px rgba(255,107,155,0.06); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="panel" id="ffPanel" aria-label="FF Panel UI Demo">
+      <div class="panel-header" id="dragHandle">
+        <div class="brand" aria-hidden="true">
+         <div class="logo">
+  <img src="https://i.imgur.com/MSX7bkX.jpeg" alt="Avatar">
+</div>
+          <div class="title">
+            <div class="main">Panel Fi Fai</div>
+            <div class="sub">Nlan - H4X</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="btn-circle" title="Settings (demo)"><i class="fa-solid fa-gear" style="color:var(--muted);"></i></div>
+          <div class="btn-circle" id="minBtn" title="Minimize"><i class="fa-solid fa-minus" style="color:var(--muted);"></i></div>
+        </div>
+      </div>
+      <div class="panel-body" id="panelBody">
+        <div>
+          <div class="section-title">Tùy chọn</div>
+          <div class="control-row" id="row-aimbot">
+            <div class="control-left">
+              <div class="icon"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="meta">
+                <div class="name">Aimbot</div>
+                <div class="desc">Auto Headshot</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="toggle" data-key="aimbot"><div class="knob"></div></div>
+            </div>
+          </div>
+          <div class="control-row" id="row-aimlock">
+            <div class="control-left">
+              <div class="icon"><i class="fa-solid fa-lock"></i></div>
+              <div class="meta">
+                <div class="name">Aimlock</div>
+                <div class="desc">Khóa vùng đầu</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="toggle" data-key="aimlock"><div class="knob"></div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="control-row" id="row-esp">
+            <div class="control-left">
+              <div class="icon"><i class="fa-solid fa-eye"></i></div>
+              <div class="meta">
+                <div class="name">ESP</div>
+                <div class="desc">Hiển thị vị trí địch</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+         <div class="toggle" data-key="esp"><div class="knob"></div></div>      
+         </div>
+          </div>
+          <div class="control-row" id="row-stream">
+            <div class="control-left">
+              <div class="icon"><i class="fa-solid fa-video"></i></div>
+              <div class="meta">
+                <div class="name">Stream Mode</div>
+                <div class="desc">Ẩn màn</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="toggle" data-key="stream"><div class="knob"></div></div>
+            </div>
+          </div>
+        </div>
+      <div class="panel-footer">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="status-dot" id="globalDot"></div>
+          <div class="small">Status</div>
+          
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="small" style="color:var(--muted)">Nlan</div>
+          <div class="small" style="color:var(--muted)">•</div>
+          <div class="small" style="color:var(--muted)">2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  (function(){
+    const toggles = document.querySelectorAll('.toggle');
+    const term = document.getElementById('termLog');
+    const state = { aimbot:false, aimlock:false, esp:false, stream:false };
+    function log(msg){
+      const time = new Date().toLocaleTimeString();
+      term.innerHTML = '• ' + time + ' — ' + msg + '<br/>' + term.innerHTML;
+      term.scrollTop = 0;
+    }
+    toggles.forEach(t => {
+      t.addEventListener('click', () => {
+        const key = t.getAttribute('data-key');
+        state[key] = !state[key];
+        t.classList.toggle('active', state[key]);
+        const row = document.getElementById('row-' + (key === 'stream' ? 'stream' : key));
+        if(row) row.classList.toggle('active', state[key]);
+        const badge = document.getElementById('status-' + (key === 'stream' ? 'stream' : key));
+        if(badge) {
+          badge.textContent = state[key] ? 'ON' : 'OFF';
+          badge.style.background = state[key] ? 'linear-gradient(90deg, var(--accent1), var(--accent2))' : 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))';
+          badge.style.color = state[key] ? '#fff' : '#ddd';
+        }
+        log((key.charAt(0).toUpperCase() + key.slice(1)) + ' toggled ' + (state[key] ? 'ON' : 'OFF') + ' (UI demo)');
+        const anyOn = Object.values(state).some(v=>v);
+        document.getElementById('globalDot').className = anyOn ? 'status-dot' : 'status-dot status-off';
+      });
+    });
+    const aimStrength = document.getElementById('aimStrength');
+    const aimVal = document.getElementById('aimVal');
+    aimStrength.addEventListener('input', ()=> {
+      aimVal.textContent = aimStrength.value;
+    });
+    aimStrength.addEventListener('change', ()=> {
+      log('Aimbot strength set to ' + aimStrength.value + ' (UI demo)');
+    });
+    const accentSelect = document.getElementById('accentSelect');
+    accentSelect.addEventListener('change', ()=> {
+      const v = accentSelect.value;
+      const root = document.documentElement.style;
+      if(v === 'accent1'){
+        root.setProperty('--accent1', '#b260ff');
+        root.setProperty('--accent2', '#6a00ff');
+        root.setProperty('--accent3', '#9c33ffbd');
+        root.setProperty('--accent4', '#6811e2');
+      } else if(v === 'accent2'){
+        root.setProperty('--accent1', '#8b00ff');
+        root.setProperty('--accent2', '#3d00ff');
+        root.setProperty('--accent3', '#7b3cffbd');
+        root.setProperty('--accent4', '#3a0ecf');
+      } else {
+        root.setProperty('--accent1', '#a05aff');
+        root.setProperty('--accent2', '#5726b8');
+        root.setProperty('--accent3', '#8c5bffbd');
+        root.setProperty('--accent4', '#4522a1');
+      }
+      log('Theme accent changed (demo)');
+    });
+    document.getElementById('minBtn').addEventListener('click', ()=>{
+      const body = document.getElementById('panelBody');
+      if(body.style.display === 'none'){
+        body.style.display = '';
+        document.getElementById('minBtn').innerHTML = '<i class="fa-solid fa-minus" style="color:var(--muted);"></i>';
+      } else {
+        body.style.display = 'none';
+        document.getElementById('minBtn').innerHTML = '<i class="fa-solid fa-square-plus" style="color:var(--muted);"></i>';
+      }
+    });
+    (function makeDraggable(){
+      const panel = document.getElementById('ffPanel');
+      const handle = document.getElementById('dragHandle');
+      let isDown=false, startX=0, startY=0, origX=0, origY=0;
+
+      handle.style.cursor = 'grab';
+      handle.addEventListener('pointerdown', (e)=>{
+        isDown = true;
+        handle.setPointerCapture(e.pointerId);
+        startX = e.clientX; startY = e.clientY;
+        const rect = panel.getBoundingClientRect();
+        origX = rect.left; origY = rect.top;
+      });
+      window.addEventListener('pointermove', (e)=>{
+        if(!isDown) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        panel.style.position = 'fixed';
+        panel.style.left = Math.max(8, Math.min(window.innerWidth - panel.offsetWidth - 8, origX + dx)) + 'px';
+        panel.style.top = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, origY + dy)) + 'px';
+      });
+      window.addEventListener('pointerup', (e)=>{
+        if(isDown) { isDown=false; handle.releasePointerCapture && handle.releasePointerCapture(e.pointerId); }
+      });
+    })();
+    document.querySelectorAll('.badge').forEach(b=>{
+      if(b.textContent.trim()==='OFF'){
+        b.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))';
+        b.style.color = '#ddd';
+      }
+    });
+    setTimeout(()=> log('Giao diện sẵn sàng — tương tác để xem hiệu ứng.'), 600);
+  })();
+</script>
+</body>
+</html>
